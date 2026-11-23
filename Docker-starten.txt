@@ -1,0 +1,4 @@
+Steuerung (im Ordner E:\praxis-projekte\Patientenaufruf\docker):
+docker compose --env-file ../.env -p patientenaufruf-local logs -f app    # Logs
+docker compose --env-file ../.env -p patientenaufruf-local up -d          # nach .env-Änderung
+docker compose --env-file ../.env -p patientenaufruf-local down           # stoppen

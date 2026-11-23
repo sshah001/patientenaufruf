@@ -13,8 +13,10 @@ const state = {
   patients: [],
   rooms: [],
   search: "",
-  /** Zuletzt gewählter Raum – wird in neuen Zeilen vorbelegt. */
+  /** Zuletzt gewählter Raum – nur für „In Behandlung setzen (ohne Ansage)". */
   lastRoomId: localStorage.getItem("pa.lastRoomId") || "",
+  /** Raumwahl je Patient (id → roomId), bleibt beim Neuzeichnen erhalten. */
+  roomChoice: new Map(),
   /** Patienten, für die gerade eine Ansage läuft oder ansteht. */
   busy: new Set(),
 };
@@ -91,23 +93,21 @@ function groups() {
 // ------------------------------------------------------- Wartende Patienten
 
 function roomSelect(patient) {
+  const id = idOf(patient);
+  const chosen = state.roomChoice.get(id) || "";
   const select = el("select", { "aria-label": `Raum für ${patient.lastName}` });
   select.appendChild(el("option", { value: "", text: "Raum wählen" }));
 
   for (const room of state.rooms) {
     const option = el("option", { value: room.id, text: room.label });
-    if (room.id === state.lastRoomId) option.selected = true;
+    if (room.id === chosen) option.selected = true;
     select.appendChild(option);
   }
 
+  // Nur diese eine Zeile ändert sich – andere Patienten behalten ihre Wahl.
   select.addEventListener("change", () => {
-    state.lastRoomId = select.value;
-    if (select.value) localStorage.setItem("pa.lastRoomId", select.value);
-    // Andere Zeilen mitziehen, damit die Wahl nur einmal nötig ist.
-    for (const other of dom.waitingBody.querySelectorAll("select")) {
-      if (other !== select && !other.dataset.touched) other.value = select.value;
-    }
-    select.dataset.touched = "1";
+    if (select.value) state.roomChoice.set(id, select.value);
+    else state.roomChoice.delete(id);
   });
 
   return select;
@@ -343,6 +343,7 @@ async function callPatient(id, roomId) {
     await api(`/api/patients/${id}/call`, { method: "POST", body: { roomId } });
     state.lastRoomId = roomId;
     localStorage.setItem("pa.lastRoomId", roomId);
+    state.roomChoice.delete(id);
   } catch (err) {
     state.busy.delete(id);
     render();
