@@ -1,0 +1,36 @@
+# Abhängigkeiten
+node_modules/
+
+# Geheimnisse und lokale Anpassungen
+.env
+config/local.json
+
+# Laufzeitdaten: SQLite-Datenbank, Ansagen-Cache, Aufnahmen – enthalten Patientendaten
+data/
+*.db
+*.db-wal
+*.db-shm
+uploads/
+backups/
+
+# Patientendaten-Exporte (Doctolib) niemals einchecken
+export_*.csv
+export_*.json
+
+# Stimmmodelle (mehrere hundert MB) – liegen auf dem Server
+voices/*
+!voices/.gitkeep
+Piper-Models/
+*.onnx
+*.onnx.json
+
+# Altlasten / Werkzeuge
+_old-*/
+.claude/
+.vscode/settings.json
+
+# Logs und Systemdateien
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db

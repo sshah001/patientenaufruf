@@ -1,0 +1,50 @@
+# =============================================================================
+#  Patientenaufruf – Betrieb mit Docker Compose
+#
+#  Start:   cd docker && docker compose up -d --build
+#  Logs:    docker compose logs -f app
+#  Update:  git pull && docker compose up -d --build
+#
+#  Alle Geheimnisse und Adressen stehen in der Datei ../.env – NICHT hier.
+#  Eine Datenbank als eigener Dienst ist nicht mehr nötig: die Daten liegen
+#  als SQLite-Datei im Volume "app_data" (data/patientenaufruf.db).
+# =============================================================================
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: patientenaufruf:2
+    # Bewusst kein fester container_name: So kann eine zweite Instanz (z. B.
+    # zum Testen auf einem anderen Port) aus einem anderen Ordner parallel
+    # laufen. Der Name ergibt sich aus dem Ordner bzw. "docker compose -p".
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      # Im Container immer Port 3000; nach außen gilt HOST_PORT (siehe unten).
+      PORT: "3000"
+      NODE_ENV: production
+      USE_MEMORY_DB: "false"
+      DB_PATH: /app/data/patientenaufruf.db
+      PIPER_VOICES_DIR: /app/voices
+    ports:
+      - "${HOST_PORT:-3300}:3000"
+    volumes:
+      # Datenbank, vorproduzierte Ansagen und Aufnahme-Datensatz.
+      - app_data:/app/data
+      # Stimmmodelle (*.onnx + *.onnx.json) vom Server – nur lesend.
+      # Auf dem Praxisserver: PIPER_VOICES_HOST_DIR=/root/.local/share/piper
+      - ${PIPER_VOICES_HOST_DIR:-../voices}:/app/voices:ro
+      # Eigene Anpassungen (config/local.json) ohne Neubau des Images.
+      # Hier liegt KEIN Programmcode mehr, nur JSON-Einstellungen.
+      - ../config:/app/config:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  app_data:

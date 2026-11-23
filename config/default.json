@@ -1,0 +1,157 @@
+{
+  "app": {
+    "name": "Patientenaufruf",
+    "port": 3300,
+    "publicUrl": "http://192.168.130.196:3300",
+    "timezone": "Europe/Berlin",
+    "logLevel": "info"
+  },
+  "practice": {
+    "name": "Praxis Rosenthal",
+    "logoUrl": "",
+    "rooms": [
+      {
+        "id": "bz1",
+        "label": "Behandlungszimmer 1",
+        "spoken": "in Behandlungszimmer eins",
+        "color": "#2f6f9f"
+      },
+      {
+        "id": "bz2",
+        "label": "Behandlungszimmer 2",
+        "spoken": "in Behandlungszimmer zwei",
+        "color": "#297e76"
+      },
+      {
+        "id": "bz3",
+        "label": "Behandlungszimmer 3",
+        "spoken": "in Behandlungszimmer drei",
+        "color": "#4f7d4a"
+      },
+      {
+        "id": "labor",
+        "label": "Labor",
+        "spoken": "in das Labor",
+        "color": "#6a5da8"
+      },
+      {
+        "id": "ekg",
+        "label": "EKG",
+        "spoken": "in das E K G Zimmer",
+        "color": "#96578a"
+      },
+      {
+        "id": "physio",
+        "label": "Physio",
+        "spoken": "in das Physio Zimmer",
+        "color": "#9e6a2a"
+      },
+      {
+        "id": "anm",
+        "label": "Anmeldung",
+        "spoken": "zur Anmeldung",
+        "color": "#64748b"
+      }
+    ]
+  },
+  "announcement": {
+    "template": "{anrede} {name}, bitte kommen Sie {raum}.",
+    "templateNoGender": "{name}, bitte kommen Sie {raum}.",
+    "repeatCount": 2,
+    "repeatDelayMs": 3000,
+    "gongEnabled": true,
+    "gongFile": "gong.wav",
+    "maxQueueLength": 25,
+    "gongTones": [
+      660,
+      880
+    ],
+    "presets": [
+      "Wir bitten um etwas Geduld, es geht gleich weiter.",
+      "Bitte halten Sie Ihre Versichertenkarte bereit.",
+      "Die Praxis schließt in zehn Minuten.",
+      "Bitte melden Sie sich noch einmal an der Anmeldung.",
+      "Wir bitten Sie, im Wartebereich einen Mund-Nasen-Schutz zu tragen.",
+      "Der nächste Patient wird gleich aufgerufen."
+    ]
+  },
+  "tts": {
+    "enabled": true,
+    "piperBin": "piper",
+    "voicesDir": "./voices",
+    "voice": "de_DE-thorsten-medium",
+    "lengthScale": 1,
+    "noiseScale": 0.667,
+    "noiseW": 0.8,
+    "sentenceSilenceSec": 0.35,
+    "cacheDir": "./data/audio-cache",
+    "cacheMaxFiles": 2000,
+    "prewarmOnImport": true,
+    "prewarmConcurrency": 2,
+    "timeoutMs": 30000,
+    "prewarmRooms": [],
+    "prewarmMaxItems": 500
+  },
+  "mopidy": {
+    "enabled": true,
+    "rpcUrl": "http://192.168.130.196:6680/mopidy/rpc",
+    "audioBaseUrl": "http://192.168.130.196:3300/audio",
+    "pollIntervalMs": 400,
+    "maxPlaybackMs": 45000,
+    "requestTimeoutMs": 5000,
+    "volume": null,
+    "restorePreviousPlayback": false
+  },
+  "signage": {
+    "enabled": true,
+    "mode": "overlay",
+    "host": "192.168.130.204",
+    "port": 8000,
+    "apiVersion": "auto",
+    "verifyOnStart": true,
+    "requestTimeoutMs": 6000,
+    "notice": {
+      "enabled": false,
+      "durationSec": 15
+    },
+    "asset": {
+      "enabled": false,
+      "filename": "popup-aufruf.link",
+      "durationSec": 15,
+      "defaultPlaylist": "Pi_Praxisschild_Playlist"
+    },
+    "overlay": {
+      "popupSeconds": 18,
+      "tickerEnabled": true,
+      "tickerCount": 3,
+      "showTime": true,
+      "showWeather": false
+    }
+  },
+  "privacy": {
+    "nameDisplay": "full",
+    "showFirstName": false,
+    "audioRetentionHours": 24,
+    "callLogRetentionDays": 30,
+    "rssRequiresToken": true
+  },
+  "security": {
+    "authEnabled": true,
+    "sessionHours": 12,
+    "allowedOrigins": [],
+    "trustProxy": false
+  },
+  "import": {
+    "defaultMode": "merge",
+    "keepCalledOnReplace": true,
+    "maxFileSizeMb": 10,
+    "todayOnly": false
+  },
+  "weather": {
+    "enabled": true,
+    "zip": "55490",
+    "country": "DE",
+    "cacheMinutes": 15,
+    "requestTimeoutMs": 8000
+  }
+}

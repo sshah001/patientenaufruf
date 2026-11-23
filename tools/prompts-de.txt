@@ -1,0 +1,189 @@
+# Aufnahmesätze für das Training der Praxisstimme
+#
+# Aufbau:
+#   Teil A (1-60)   Echte Ansagesätze. Genau diese Satzmelodie wird im
+#                   Praxisalltag gebraucht - sie hat den größten Einfluss auf
+#                   die Qualität des Ergebnisses.
+#   Teil B (61-110) Häufige deutsche Nachnamen einzeln. Trainiert die
+#                   Aussprache von Namen, dem einzigen variablen Teil.
+#   Teil C (111-180) Phonetisch breit gestreute Alltagssätze. Sie geben dem
+#                   Modell die Laute, die in Teil A und B nicht vorkommen.
+#
+# Zeilen mit # werden ignoriert. Reihenfolge nicht ändern - die Nummern
+# entsprechen den Dateinamen im Datensatz.
+
+# --- Teil A: Ansagen -------------------------------------------------------
+Herr Schneider, bitte kommen Sie in Behandlungszimmer eins.
+Frau Schneider, bitte kommen Sie in Behandlungszimmer eins.
+Herr Wagner, bitte kommen Sie in Behandlungszimmer zwei.
+Frau Wagner, bitte kommen Sie in Behandlungszimmer zwei.
+Herr Fischer, bitte kommen Sie in Behandlungszimmer drei.
+Frau Fischer, bitte kommen Sie in Behandlungszimmer drei.
+Herr Weber, bitte kommen Sie in das Labor.
+Frau Weber, bitte kommen Sie in das Labor.
+Herr Becker, bitte kommen Sie in das E K G Zimmer.
+Frau Becker, bitte kommen Sie in das E K G Zimmer.
+Herr Hoffmann, bitte kommen Sie in das Physio Zimmer.
+Frau Hoffmann, bitte kommen Sie in das Physio Zimmer.
+Herr Schulz, bitte kommen Sie zur Anmeldung.
+Frau Schulz, bitte kommen Sie zur Anmeldung.
+Herr Koch, bitte kommen Sie in Behandlungszimmer eins.
+Frau Bauer, bitte kommen Sie in Behandlungszimmer zwei.
+Herr Richter, bitte kommen Sie in Behandlungszimmer drei.
+Frau Klein, bitte kommen Sie in das Labor.
+Herr Wolf, bitte kommen Sie in das E K G Zimmer.
+Frau Neumann, bitte kommen Sie in das Physio Zimmer.
+Herr Schwarz, bitte kommen Sie zur Anmeldung.
+Frau Zimmermann, bitte kommen Sie in Behandlungszimmer eins.
+Herr Braun, bitte kommen Sie in Behandlungszimmer zwei.
+Frau Krüger, bitte kommen Sie in Behandlungszimmer drei.
+Herr Hofmann, bitte kommen Sie in das Labor.
+Frau Hartmann, bitte kommen Sie in das E K G Zimmer.
+Herr Lange, bitte kommen Sie in das Physio Zimmer.
+Frau Werner, bitte kommen Sie zur Anmeldung.
+Herr Krause, bitte kommen Sie in Behandlungszimmer eins.
+Frau Lehmann, bitte kommen Sie in Behandlungszimmer zwei.
+Herr Schmid, bitte kommen Sie in Behandlungszimmer drei.
+Frau Schulze, bitte kommen Sie in das Labor.
+Herr Maier, bitte kommen Sie in das E K G Zimmer.
+Frau Köhler, bitte kommen Sie in das Physio Zimmer.
+Herr Herrmann, bitte kommen Sie zur Anmeldung.
+Frau König, bitte kommen Sie in Behandlungszimmer eins.
+Herr Walter, bitte kommen Sie in Behandlungszimmer zwei.
+Frau Mayer, bitte kommen Sie in Behandlungszimmer drei.
+Herr Huber, bitte kommen Sie in das Labor.
+Frau Kaiser, bitte kommen Sie in das E K G Zimmer.
+Bitte kommen Sie in Behandlungszimmer eins.
+Bitte kommen Sie in Behandlungszimmer zwei.
+Bitte kommen Sie in Behandlungszimmer drei.
+Bitte kommen Sie in das Labor.
+Bitte kommen Sie in das E K G Zimmer.
+Bitte kommen Sie in das Physio Zimmer.
+Bitte kommen Sie zur Anmeldung.
+Bitte nehmen Sie noch einen Moment Platz.
+Wir bitten um etwas Geduld, es geht gleich weiter.
+Die Praxis schließt in zehn Minuten.
+Bitte halten Sie Ihre Versichertenkarte bereit.
+Herzlich willkommen in unserer Praxis.
+Vielen Dank für Ihren Besuch, kommen Sie gut nach Hause.
+Der nächste Patient wird gleich aufgerufen.
+Bitte begeben Sie sich zum Wartebereich im ersten Stock.
+Ihre Untersuchung beginnt in wenigen Minuten.
+Bitte melden Sie sich noch einmal an der Anmeldung.
+Frau Doktor Rosenthal erwartet Sie bereits.
+Herr Doktor Rosenthal erwartet Sie bereits.
+Bitte betreten Sie das Zimmer erst nach dem Aufruf.
+
+# --- Teil B: Nachnamen -----------------------------------------------------
+Müller
+Schmidt
+Schneider
+Fischer
+Weber
+Meyer
+Wagner
+Becker
+Schulz
+Hoffmann
+Schäfer
+Koch
+Bauer
+Richter
+Klein
+Wolf
+Schröder
+Neumann
+Schwarz
+Zimmermann
+Braun
+Krüger
+Hofmann
+Hartmann
+Lange
+Schmitt
+Werner
+Schmitz
+Krause
+Meier
+Lehmann
+Schmid
+Schulze
+Maier
+Köhler
+Herrmann
+König
+Walter
+Mayer
+Huber
+Kaiser
+Fuchs
+Peters
+Lang
+Scholz
+Möller
+Weiß
+Jung
+Hahn
+Schubert
+
+# --- Teil C: Phonetische Breite --------------------------------------------
+Das Wetter ist heute überraschend freundlich geworden.
+Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich.
+Franz jagt im komplett verwahrlosten Taxi quer durch Bayern.
+Die Sonne ging langsam hinter den Bergen unter.
+Im Sommer fahren wir mit dem Zug an die Ostsee.
+Bitte schließen Sie die Tür leise hinter sich.
+Der Arzt erklärte die Untersuchung ausführlich und ruhig.
+Sechsundsiebzig Patienten warteten an diesem Vormittag.
+Wir haben Ihren Termin auf nächsten Dienstag verschoben.
+Die Röntgenaufnahme zeigt keinerlei Auffälligkeiten.
+Nehmen Sie die Tabletten bitte zweimal täglich nach dem Essen.
+Ihre Blutwerte sind vollkommen in Ordnung.
+Der Verband sollte in drei Tagen gewechselt werden.
+Bitte trinken Sie ausreichend Wasser über den Tag verteilt.
+Möchten Sie einen Folgetermin vereinbaren?
+Die Überweisung schicken wir direkt an das Krankenhaus.
+Ich schreibe Ihnen ein Rezept für die Schmerzmittel.
+Wie lange bestehen die Beschwerden denn schon?
+Haben Sie in letzter Zeit Fieber gehabt?
+Bitte atmen Sie einmal tief ein und wieder aus.
+Wir sehen uns in zwei Wochen zur Nachkontrolle.
+Die Physiotherapie beginnt kommende Woche am Montag.
+Ihre Krankmeldung gilt bis einschließlich Freitag.
+Achtundvierzig Stunden sollten Sie sich noch schonen.
+Ein herzliches Dankeschön an das gesamte Praxisteam.
+Der Frühling bringt jedes Jahr neue Blüten hervor.
+Nachts hörte man nur das Rauschen der Blätter.
+Über sieben Brücken musst du gehen.
+Quietschende Türen stören die Ruhe im Wartezimmer.
+Xaver züchtet Yaks auf einem Zürcher Bauernhof.
+Der Physiker prüfte die Hypothese sorgfältig nach.
+Psychologische Betreuung gehört ebenfalls zum Angebot.
+Chirurgische Eingriffe erfordern höchste Konzentration.
+Das Champagnerglas zersprang mit einem hellen Klang.
+Journalisten berichteten ausführlich über das Ereignis.
+Vierzehn Ärztinnen und Ärzte arbeiten in diesem Haus.
+Die Straßenbahn hielt quietschend an der Kreuzung.
+Ein ungewöhnlich kühler August liegt hinter uns.
+Öffnen Sie bitte das Fenster für frische Luft.
+Übermorgen ist die Praxis ganztägig geschlossen.
+Ärgern Sie sich nicht über die kurze Wartezeit.
+Häufige Fragen beantworten wir gerne persönlich.
+Die Grippeimpfung empfehlen wir ab Oktober.
+Zöliakie erfordert eine dauerhafte Ernährungsumstellung.
+Bitte bringen Sie den Impfausweis zum nächsten Termin mit.
+Rheumatische Beschwerden nehmen bei Kälte oft zu.
+Der Bluthochdruck lässt sich gut medikamentös einstellen.
+Ihre Schilddrüsenwerte kontrollieren wir im Frühjahr erneut.
+Das Ergebnis der Laboruntersuchung liegt morgen vor.
+Vielen Dank, dass Sie so pünktlich gekommen sind.
+Neunundneunzig Prozent aller Fälle verlaufen unkompliziert.
+Wir wünschen Ihnen eine rasche und vollständige Genesung.
+Bitte informieren Sie uns, falls sich Ihre Adresse ändert.
+Die Sprechstunde endet heute bereits um vierzehn Uhr.
+Am Wochenende erreichen Sie den ärztlichen Bereitschaftsdienst.
+Zögern Sie nicht, bei Fragen jederzeit anzurufen.
+Ihre Unterlagen haben wir vollständig erhalten.
+Das war schon alles, Sie können sich wieder anziehen.
+Schönen Tag noch und alles Gute für Sie.
+Auf Wiedersehen und bis zum nächsten Mal.

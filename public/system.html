@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>System – Patientenaufruf</title>
+<link rel="stylesheet" href="/css/app.css">
+<style>
+  .check {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 13px 0; border-bottom: 1px solid var(--border);
+  }
+  .check:last-child { border-bottom: none; }
+  .check .icon {
+    width: 22px; height: 22px; border-radius: 50%; flex: none;
+    display: grid; place-items: center;
+    font-size: 13px; font-weight: 700; color: #fff; margin-top: 1px;
+  }
+  .check .icon.ok { background: var(--ok); }
+  .check .icon.bad { background: var(--danger); }
+  .check .body { flex: 1; min-width: 0; }
+  .check .name { font-weight: 600; }
+  .check .detail { color: var(--text-muted); font-size: 13.5px; word-break: break-word; }
+  .check .hint { color: var(--warn); font-size: 13px; margin-top: 3px; }
+
+  .stat { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; font-size: 14px; }
+  .stat + .stat { border-top: 1px solid var(--border); }
+  .stat .v { font-family: var(--mono); font-size: 13px; text-align: right; word-break: break-all; }
+
+  .voicerow {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 13px; border: 1px solid var(--border);
+    border-radius: var(--radius); margin-bottom: 8px;
+  }
+  .voicerow[data-active="1"] { border-color: var(--accent); background: var(--accent-soft); }
+  .voicerow .meta { flex: 1; min-width: 0; }
+  .voicerow .id { font-family: var(--mono); font-size: 12px; color: var(--text-muted); }
+
+  audio { width: 100%; margin-top: 10px; }
+  pre {
+    background: var(--bg-sunken); padding: 12px; border-radius: var(--radius);
+    overflow: auto; font-size: 12px; max-height: 320px; margin: 0;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="dot" id="healthDot"></span> Patientenaufruf</div>
+  <nav>
+    <a href="/">Übersicht</a>
+    <a href="/tv" target="_blank" rel="noopener">Monitor</a>
+    <a href="/import">Import</a>
+    <a href="/voice-studio">Stimme</a>
+    <a href="/system">System</a>
+  </nav>
+</header>
+
+<main class="page">
+  <h1>System und Diagnose</h1>
+  <p class="subtitle">Wenn ein Aufruf nicht funktioniert: hier steht, welches Teilsystem klemmt.</p>
+
+  <div class="card">
+    <div class="row between" style="margin-bottom:6px">
+      <h2 style="margin:0">Selbsttest</h2>
+      <button class="primary" id="selftestBtn">Test starten</button>
+    </div>
+    <div id="selftest"><p class="muted">Noch nicht ausgeführt.</p></div>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h2>Sprachausgabe testen</h2>
+      <div class="field">
+        <label for="testText">Ansagetext</label>
+        <input id="testText" value="Frau Mustermann, bitte kommen Sie in Behandlungszimmer eins.">
+      </div>
+      <div class="row">
+        <button id="ttsBtn">Nur erzeugen und hier anhören</button>
+        <button class="primary" id="playBtn">Über Lautsprecher ausgeben</button>
+      </div>
+      <p class="hint">
+        „Über Lautsprecher“ testet den kompletten Weg: Piper → Server → Mopidy → Snapcast.
+      </p>
+      <audio id="player" controls hidden></audio>
+      <div id="ttsResult"></div>
+    </div>
+
+    <div class="card">
+      <h2>Verfügbare Stimmen</h2>
+      <div id="voices"><p class="muted">Wird geladen…</p></div>
+      <p class="hint">
+        Die aktive Stimme wird in der <code>.env</code> über <code>PIPER_VOICE</code> festgelegt.
+        Eine eigene Praxisstimme entsteht unter <a href="/voice-studio">Stimme</a>.
+      </p>
+      <button class="ghost small" id="clearCacheBtn" style="margin-top:10px">Audio-Zwischenspeicher leeren</button>
+    </div>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <h2>Zustand</h2>
+      <div id="stats"><p class="muted">Wird geladen…</p></div>
+    </div>
+
+    <div class="card">
+      <h2>Wartezimmer-Anzeige</h2>
+      <div id="signage"><p class="muted">Wird geladen…</p></div>
+      <div class="row" style="margin-top:14px">
+        <button id="probeBtn">piSignage prüfen</button>
+        <button class="ghost" id="probeFullBtn" title="Löst eine sichtbare Testeinblendung auf dem Fernseher aus">Mit Testeinblendung</button>
+      </div>
+      <div id="probeResult" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row between" style="margin-bottom:12px">
+      <h2 style="margin:0">Letzte Aufrufe</h2>
+      <button class="ghost small" id="reloadLog">Aktualisieren</button>
+    </div>
+    <table>
+      <thead><tr><th>Zeit</th><th>Patient</th><th>Raum</th><th>Ton</th><th>Anzeige</th><th>Stimme</th></tr></thead>
+      <tbody id="calllog"></tbody>
+    </table>
+  </div>
+</main>
+
+<div id="toasts"></div>
+<script src="/js/common.js"></script>
+<script src="/js/system.js"></script>
+</body>
+</html>

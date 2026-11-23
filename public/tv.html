@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wartezimmer</title>
+<style>
+/* ==========================================================================
+   Wartezimmer-Anzeige für den Fernseher.
+
+   Helles, ruhiges Bild: Ein Wartezimmer ist tagsüber hell, eine dunkle
+   Fläche wirkt dort wie ein ausgeschaltetes Gerät. Die Farbe kommt
+   ausschließlich vom Raum des Aufrufs – alles andere bleibt zurückhaltend.
+
+   Wird in piSignage als .link-Asset eingebunden und hält selbst eine
+   WebSocket-Verbindung zum Server; der Aufruf erscheint dadurch ohne Umweg
+   über die piSignage-API.
+
+   Schriftgrößen skalieren mit vh/vw, damit die Anzeige aus mehreren Metern
+   Entfernung lesbar bleibt.
+   ========================================================================== */
+:root {
+  --bg: #f4f7fa;
+  --surface: #ffffff;
+  --line: #e2e9f0;
+  --text: #243447;
+  --muted: #6b7f94;
+  --accent: #2f6f9f;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#screen { height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
+
+/* ------------------------------------------------------------- Kopfzeile */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2.4vh 3.4vw;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.practice { font-size: 2.7vh; font-weight: 600; color: var(--muted); letter-spacing: 0.01em; }
+.clock { font-size: 3.4vh; font-weight: 300; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; color: var(--text); }
+
+/* ----------------------------------------------------------- Ruhezustand */
+#idle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3vh;
+  text-align: center;
+  padding: 4vh;
+}
+#idle .welcome {
+  font-size: 5.4vh;
+  font-weight: 200;
+  letter-spacing: -0.02em;
+  color: var(--muted);
+}
+#idle .lastcalls { display: flex; flex-direction: column; gap: 1.3vh; width: min(78vw, 920px); }
+#idle .lastcall {
+  display: flex;
+  align-items: center;
+  gap: 2vh;
+  padding: 1.9vh 2.8vh;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 0.55vh solid var(--room, var(--accent));
+  border-radius: 1.1vh;
+  font-size: 3vh;
+  box-shadow: 0 1px 3px rgba(36, 52, 71, 0.05);
+}
+#idle .lastcall .who { font-weight: 650; flex: 1; text-align: left; }
+#idle .lastcall .room { color: var(--room, var(--accent)); font-weight: 650; }
+#idle .lastcall .when { color: var(--muted); font-size: 2.1vh; font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------------- Aufruf */
+#popup {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3.4vh;
+  background: radial-gradient(circle at 50% 42%, #ffffff 0%, var(--bg) 72%);
+  animation: popup-in 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#popup[data-show="1"] { display: flex; }
+
+@keyframes popup-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+#popup .name {
+  font-size: min(13vh, 11vw);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  text-align: center;
+  padding: 0 4vw;
+  word-break: break-word;
+  color: var(--text);
+}
+#popup .label {
+  font-size: 2.4vh;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: -1.4vh;
+}
+#popup .room {
+  display: inline-flex;
+  align-items: center;
+  font-size: min(7vh, 6vw);
+  font-weight: 650;
+  padding: 1.9vh 5vh;
+  border-radius: 1.8vh;
+  background: color-mix(in srgb, var(--room, var(--accent)) 10%, #fff);
+  border: 0.3vh solid var(--room, var(--accent));
+  color: var(--room, var(--accent));
+}
+
+/* Zeitbalken zeigt, wie lange der Aufruf noch steht. */
+#popup .timer {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 0.65vh;
+  background: var(--room, var(--accent));
+  transform-origin: left;
+  animation: timer linear forwards;
+}
+@keyframes timer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+/* ------------------------------------------------------- Freie Durchsage */
+#message {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4vh;
+  padding: 6vw;
+  background: #fdfbf6;
+  animation: popup-in 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#message[data-show="1"] { display: flex; }
+#message .label {
+  font-size: 2.8vh; letter-spacing: 0.18em; text-transform: uppercase;
+  color: #a97428; font-weight: 650;
+}
+#message .text {
+  font-size: min(8vh, 6.4vw);
+  font-weight: 500;
+  line-height: 1.28;
+  text-align: center;
+  letter-spacing: -0.02em;
+  max-width: 22ch;
+}
+#message .timer {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 0.65vh; background: #a97428;
+  transform-origin: left; animation: timer linear forwards;
+}
+
+/* --------------------------------------------------------------- Laufband */
+footer {
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  overflow: hidden;
+  height: 7vh;
+  display: flex;
+  align-items: center;
+}
+#ticker {
+  display: flex;
+  align-items: center;
+  gap: 6vw;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: scroll 34s linear infinite;
+  font-size: 2.9vh;
+}
+#ticker.paused { animation-play-state: paused; }
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+#ticker .item { display: inline-flex; align-items: center; gap: 1.3vh; }
+#ticker .item .dot { width: 1.3vh; height: 1.3vh; border-radius: 50%; background: var(--room, var(--accent)); }
+#ticker .item .who { font-weight: 600; }
+#ticker .item .room { color: var(--muted); }
+
+/* ---------------------------------------------------- Verbindungsanzeige */
+#conn {
+  position: fixed;
+  top: 1.1vh; right: 0.9vw;
+  width: 1vh; height: 1vh;
+  border-radius: 50%;
+  background: #3d8168;
+  opacity: 0.35;
+  z-index: 200;
+  transition: background 0.3s, opacity 0.3s;
+}
+#conn[data-state="off"] { background: #b1524e; opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  #ticker { animation: none; padding-left: 2vw; }
+  #popup, #message { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<div id="conn" title="Verbindung"></div>
+
+<div id="screen">
+  <header>
+    <div class="practice" id="practiceName">Praxis</div>
+    <div class="clock" id="clock">--:--</div>
+  </header>
+
+  <section id="idle">
+    <div class="welcome" id="welcome">Herzlich willkommen</div>
+    <div class="lastcalls" id="lastcalls"></div>
+  </section>
+
+  <footer>
+    <div id="ticker"></div>
+  </footer>
+</div>
+
+<div id="popup">
+  <div class="name" id="popupName"></div>
+  <!-- Neutrale Beschriftung: „bitte kommen Sie in“ passt nicht zu jedem
+       Raumnamen („in Anmeldung“), „Raum“ dagegen immer. -->
+  <div class="label">Raum</div>
+  <div class="room" id="popupRoom"></div>
+  <div class="timer" id="popupTimer"></div>
+</div>
+
+<div id="message">
+  <div class="label">Durchsage</div>
+  <div class="text" id="messageText"></div>
+  <div class="timer" id="messageTimer"></div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/tv.js"></script>
+</body>
+</html>

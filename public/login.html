@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anmeldung – Patientenaufruf</title>
+<link rel="stylesheet" href="/css/app.css">
+<style>
+  body { display: grid; place-items: center; min-height: 100vh; }
+  .box { width: min(400px, 92vw); }
+  .box .card { padding: 32px; }
+  h1 { font-size: 20px; margin-bottom: 6px; }
+  #pin {
+    font-size: 26px;
+    letter-spacing: 0.35em;
+    text-align: center;
+    padding: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  #submit { width: 100%; margin-top: 6px; }
+  #error { display: none; margin-top: 14px; margin-bottom: 0; }
+  #error[data-show="1"] { display: block; }
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="card">
+    <h1>Patientenaufruf</h1>
+    <p class="subtitle" style="margin-bottom:22px">Bitte den Praxis-PIN eingeben.</p>
+
+    <form id="form">
+      <div class="field">
+        <label for="pin">PIN</label>
+        <input type="password" id="pin" inputmode="numeric" autocomplete="current-password"
+               autofocus required aria-describedby="error">
+      </div>
+      <button type="submit" class="primary big" id="submit">Anmelden</button>
+    </form>
+
+    <div class="notice error" id="error" role="alert"></div>
+  </div>
+</div>
+
+<script src="/js/common.js"></script>
+<script src="/js/login.js"></script>
+</body>
+</html>

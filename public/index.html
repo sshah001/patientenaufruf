@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patientenübersicht – Patientenaufruf</title>
+<link rel="stylesheet" href="/css/app.css">
+<style>
+  /* ---------------------------------------------------- Kopfzeile mit Suche */
+  .topbar .search { margin-left: auto; width: min(320px, 30vw); position: relative; }
+  .topbar .search .icon {
+    position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+    color: var(--text-faint); pointer-events: none; width: 15px; height: 15px;
+  }
+  .topbar .search input { padding-left: 32px; background: var(--bg-tint); }
+
+  /* ------------------------------------------------------ Aktueller Aufruf */
+  .callbox {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    margin-bottom: 22px;
+    background: var(--bg-elevated);
+  }
+  .callbox > header {
+    display: flex; align-items: center; gap: 9px;
+    padding: 11px 18px;
+    background: var(--head-call, #17809a);
+    color: #fff;
+    font-weight: 650;
+    font-size: 14.5px;
+  }
+  .callbox > .body {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 22px;
+    min-height: 62px;
+  }
+  .callbox .who { font-size: 21px; font-weight: 650; letter-spacing: -0.015em; }
+  .callbox .room { color: var(--accent); font-weight: 650; }
+  .callbox .phase { font-size: 13.5px; color: var(--text-muted); font-style: italic; }
+  /* Drei Zustände: noch nichts (grau), letzter Aufruf (Farbe), läuft gerade
+     (Farbe plus Ring und pulsierender Punkt). */
+  .callbox.empty > header { background: var(--text-faint); }
+  .callbox.empty .who { font-weight: 450; color: var(--text-faint); font-size: 15.5px; }
+  .callbox.live { box-shadow: 0 0 0 3px rgba(23, 128, 154, 0.22), var(--shadow); }
+
+  .livedot {
+    width: 9px; height: 9px; border-radius: 50%; background: #fff;
+    animation: livepulse 1.2s ease-in-out infinite; flex: none;
+  }
+  @keyframes livepulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  /* --------------------------------------------------------- Zwei Spalten */
+  .columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 20px;
+    align-items: start;
+  }
+  @media (max-width: 1200px) { .columns { grid-template-columns: minmax(0, 1fr); } }
+
+  .panel {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .panel > header { display: flex; align-items: center; gap: 9px; }
+  .panel > header .count {
+    margin-left: auto;
+    font-weight: 700; font-size: 12.5px;
+    padding: 2px 10px; border-radius: 999px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* -------------------------------------------------------- Wartetabelle */
+  table.waiting-table td { padding: 9px 12px; font-size: 14px; }
+  table.waiting-table td.name { font-weight: 650; }
+  table.waiting-table td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  table.waiting-table td.actions { width: 1%; white-space: nowrap; }
+  table.waiting-table tr.busy { background: var(--accent-soft) !important; }
+
+  .rowactions { display: flex; align-items: center; gap: 6px; justify-content: flex-end; flex-wrap: nowrap; }
+  .rowactions select { width: auto; min-width: 160px; padding: 5px 9px; font-size: 13px; }
+  .rowactions button { padding: 5px 11px; font-size: 13px; }
+
+  button.call { background: #2f7d5b; border-color: #2f7d5b; color: #fff; }
+  button.call:hover:not(:disabled) { background: #276a4d; border-color: #276a4d; }
+  button.cancel { color: var(--text-muted); border-color: var(--border-strong); }
+  button.cancel:hover:not(:disabled) { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-line); }
+
+  /* -------------------------------------------------- Karten in Behandlung */
+  .treatcards { padding: 13px; display: flex; flex-direction: column; gap: 10px; max-height: 72vh; overflow-y: auto; }
+  .treatcard {
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--room, var(--accent));
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    background: var(--bg-tint);
+  }
+  .treatcard .top { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 8px; }
+  .treatcard .who { font-weight: 650; font-size: 15px; }
+  .treatcard .roombadge {
+    font-size: 11px; font-weight: 650;
+    padding: 2px 9px; border-radius: 999px;
+    background: color-mix(in srgb, var(--room, var(--accent)) 13%, #fff);
+    color: var(--room, var(--accent));
+    border: 1px solid color-mix(in srgb, var(--room, var(--accent)) 34%, #fff);
+    white-space: nowrap;
+  }
+  .treatcard .meta { font-size: 12px; color: var(--text-muted); margin-bottom: 9px; }
+  .treatcard .buttons { display: flex; gap: 6px; }
+  .treatcard .buttons button { flex: 1; padding: 5px 8px; font-size: 12.5px; }
+  .treatcard .buttons button.icon-only { flex: 0 0 auto; }
+
+  button.finish { background: var(--danger); border-color: var(--danger); color: #fff; }
+  button.finish:hover:not(:disabled) { background: #9a4643; border-color: #9a4643; }
+  button.recall { background: #e0a32a; border-color: #cf9524; color: #3b2c05; }
+  button.recall:hover:not(:disabled) { background: #d0961f; border-color: #b8851b; }
+
+  /* ------------------------------------------------------ Freie Durchsage */
+  .speak .body { padding: 16px 18px; }
+  #announceText { min-height: 78px; font-size: 14.5px; }
+  .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .presets button {
+    padding: 4px 11px; font-size: 12.5px; border-radius: 999px;
+    color: var(--text-muted); background: var(--bg-tint);
+    white-space: normal; text-align: left; line-height: 1.35;
+  }
+  .presets button:hover { color: var(--text); border-color: var(--accent-line); }
+  .speak .controls { display: flex; gap: 8px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+  .speak .options { display: flex; gap: 14px; align-items: center; margin-top: 12px; font-size: 13px; color: var(--text-muted); flex-wrap: wrap; }
+  .speak .options label { display: flex; align-items: center; gap: 6px; margin: 0; font-weight: 450; font-size: 13px; cursor: pointer; }
+  .speak .options select { width: auto; padding: 4px 8px; font-size: 13px; }
+  #announceCount { font-size: 12px; color: var(--text-faint); margin-left: auto; font-variant-numeric: tabular-nums; }
+  #announcePlayer { width: 100%; margin-top: 12px; }
+  #announcePlayer[hidden] { display: none; }
+  button.speakout { background: #6a5da8; border-color: #6a5da8; color: #fff; }
+  button.speakout:hover:not(:disabled) { background: #5b4f94; border-color: #5b4f94; }
+
+  .toolbar {
+    display: flex; gap: 9px; flex-wrap: wrap; align-items: center;
+    padding: 13px 20px; border-top: 1px solid var(--border);
+    background: var(--bg-tint);
+  }
+
+  #completedList { padding: 4px 10px 12px; }
+  details > summary {
+    cursor: pointer; padding: 13px 18px; font-weight: 650; font-size: 14.5px;
+    list-style: none; display: flex; align-items: center; gap: 9px;
+    color: #fff; background: var(--head-done, #3d8168);
+  }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary .chev { margin-left: auto; transition: transform 0.15s; }
+  details[open] > summary .chev { transform: rotate(90deg); }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#hauptbereich">Zum Inhalt springen</a>
+
+<!-- Symbolvorrat: einmal definiert, überall per <use> eingebunden. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-megafon" viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 001 1h2l4 4V6L6 10H4a1 1 0 00-1 1z"/><path d="M15 8a4 4 0 010 8"/><path d="M18 5a8 8 0 010 14"/></symbol>
+  <symbol id="i-sanduhr" viewBox="0 0 24 24"><path d="M6 3h12M6 21h12"/><path d="M8 3v4a4 4 0 004 4 4 4 0 004-4V3"/><path d="M8 21v-4a4 4 0 014-4 4 4 0 014 4v4"/></symbol>
+  <symbol id="i-puls" viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></symbol>
+  <symbol id="i-haken-kreis" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></symbol>
+  <symbol id="i-sprechblase" viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-8 8H4l2.5-2.5A8 8 0 1121 12z"/><path d="M9 11h6M9 14h4"/></symbol>
+  <symbol id="i-lautsprecher" viewBox="0 0 24 24"><path d="M4 9v6h3.5L12 19V5L7.5 9H4z"/><path d="M16 9a4 4 0 010 6"/><path d="M18.5 6.5a7 7 0 010 11"/></symbol>
+  <symbol id="i-verboten" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></symbol>
+  <symbol id="i-zurueck" viewBox="0 0 24 24"><path d="M3 10h11a6 6 0 010 12h-3"/><path d="M7 6l-4 4 4 4"/></symbol>
+  <symbol id="i-mehr" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1.6" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-lupe" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></symbol>
+  <symbol id="i-erneuern" viewBox="0 0 24 24"><path d="M21 12a9 9 0 11-2.6-6.4"/><path d="M21 4v5h-5"/></symbol>
+  <symbol id="i-papierkorb" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2"/><path d="M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13"/></symbol>
+  <symbol id="i-kopfhoerer" viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0116 0v2"/><path d="M4 14h3v6H5a1 1 0 01-1-1v-5z"/><path d="M20 14h-3v6h2a1 1 0 001-1v-5z"/></symbol>
+  <symbol id="i-radierer" viewBox="0 0 24 24"><path d="M5 19h14"/><path d="M14.5 4.5l5 5-8 8h-5l-2-2a1.4 1.4 0 010-2l10-9z"/></symbol>
+  <symbol id="i-stopp" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-pfeil" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="dot" id="healthDot"></span>
+    Patientenaufruf
+    <span class="sr-only" id="connState" role="status">Verbindung wird aufgebaut</span>
+  </div>
+
+  <nav aria-label="Hauptnavigation">
+    <a href="/">Übersicht</a>
+    <a href="/tv" target="_blank" rel="noopener">Monitor <span class="sr-only">(öffnet in neuem Tab)</span></a>
+    <a href="/import">Import</a>
+    <a href="/voice-studio">Stimme</a>
+    <a href="/system">System</a>
+  </nav>
+
+  <div class="search">
+    <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-lupe"/></svg>
+    <label class="sr-only" for="search">Patient nach Nachname oder Vorname suchen</label>
+    <input type="search" id="search" placeholder="Patient suchen…" autocomplete="off">
+  </div>
+
+  <button class="ghost small" id="logoutBtn">Abmelden</button>
+</header>
+
+<main class="page" id="hauptbereich">
+  <h1>Patienten&shy;übersicht</h1>
+  <p class="subtitle" id="sourceLine">Tagesliste aus Doctolib</p>
+
+  <!-- ------------------------------------------------------ Aktueller Aufruf -->
+  <section class="callbox empty" id="currentCall" aria-labelledby="callHead">
+    <header id="callHead">
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-megafon"/></svg>
+      Aktueller Aufruf
+      <span class="livedot" id="liveDot" hidden></span>
+    </header>
+    <div class="body">
+      <!-- aria-live: Screenreader lesen jeden neuen Aufruf von selbst vor. -->
+      <span class="who" id="currentWho" aria-live="polite" aria-atomic="true">Noch kein Aufruf</span>
+      <span class="phase" id="currentPhase"></span>
+      <span class="spacer"></span>
+      <button class="danger small" id="abortBtn" hidden>
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-stopp"/></svg>
+        Ansage abbrechen
+      </button>
+    </div>
+  </section>
+
+  <div class="columns">
+
+    <!-- ------------------------------------------------ Wartende Patienten -->
+    <div>
+      <section class="panel" aria-labelledby="waitHead">
+        <header class="filled head-waiting on-light" id="waitHead">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-sanduhr"/></svg>
+          Wartende Patienten
+          <span class="count" id="waitingCount">0</span>
+        </header>
+
+        <div style="overflow-x:auto">
+          <table class="waiting-table">
+            <caption class="sr-only">Wartende Patienten mit Termin, Behandler und Aktionen</caption>
+            <thead>
+              <tr>
+                <th scope="col">Anrede</th>
+                <th scope="col">Nachname</th>
+                <th scope="col">Vorname</th>
+                <th scope="col">Datum</th>
+                <th scope="col">Terminzeit</th>
+                <th scope="col">Bei wem</th>
+                <th scope="col" class="right">Aktionen</th>
+              </tr>
+            </thead>
+            <tbody id="waitingBody"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="waitingEmpty" hidden></div>
+
+        <div class="toolbar">
+          <button class="small" id="addBtn">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-plus"/></svg>
+            Patient hinzufügen
+          </button>
+          <a class="btn small" href="/import" style="padding:5px 11px;font-size:13px">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-upload"/></svg>
+            Liste importieren
+          </a>
+          <span class="spacer"></span>
+          <button class="small" id="resetBtn">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-erneuern"/></svg>
+            Aufgerufene zurücksetzen
+          </button>
+          <button class="danger small" id="clearBtn">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-papierkorb"/></svg>
+            Tag beenden
+          </button>
+        </div>
+      </section>
+
+      <!-- --------------------------------------------------- Abgeschlossen -->
+      <section class="panel">
+        <details>
+          <summary>
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-haken-kreis"/></svg>
+            Abgeschlossen
+            <span id="completedCount" style="font-weight:450;opacity:.85"></span>
+            <svg class="icon chev" aria-hidden="true" focusable="false"><use href="#i-pfeil"/></svg>
+          </summary>
+          <div id="completedList"></div>
+        </details>
+      </section>
+    </div>
+
+    <!-- --------------------------------------- Rechte Spalte: Behandlung --->
+    <div>
+      <section class="panel" aria-labelledby="treatHead">
+        <header class="filled head-treatment" id="treatHead">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-puls"/></svg>
+          In Behandlung
+          <span class="count" id="treatmentCount">0</span>
+        </header>
+        <div class="treatcards" id="treatmentList"></div>
+        <div class="empty" id="treatmentEmpty" hidden>Niemand aufgerufen.</div>
+      </section>
+
+      <!-- ------------------------------------------------ Freie Durchsage -->
+      <section class="panel speak" aria-labelledby="speakHead">
+        <header class="filled head-speak" id="speakHead">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-sprechblase"/></svg>
+          Durchsage
+        </header>
+        <div class="body">
+          <label class="sr-only" for="announceText">Text der Durchsage, höchstens 300 Zeichen</label>
+          <textarea id="announceText" maxlength="300" aria-describedby="announceCount announceHint"
+            placeholder="Text eingeben, der im Wartezimmer gesprochen werden soll…"></textarea>
+
+          <div class="presets" id="presets" role="group" aria-label="Vorlagen für Durchsagen"></div>
+
+          <div class="options">
+            <label title="Aufmerksamkeitssignal vor der Ansage">
+              <input type="checkbox" id="optGong" checked> Gong
+            </label>
+            <label title="Text zusätzlich auf dem Wartezimmer-Monitor einblenden">
+              <input type="checkbox" id="optDisplay"> Auch anzeigen
+            </label>
+            <label for="optRepeats">
+              Wiederholen
+              <select id="optRepeats">
+                <option value="1" selected>1×</option>
+                <option value="2">2×</option>
+                <option value="3">3×</option>
+              </select>
+            </label>
+            <span id="announceCount" aria-live="off">0 / 300</span>
+          </div>
+
+          <div class="controls">
+            <button class="speakout" id="announceBtn">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-megafon"/></svg>
+              Durchsagen
+            </button>
+            <button id="previewBtn" title="Nur hier anhören, nicht im Wartezimmer">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-kopfhoerer"/></svg>
+              Vorhören
+            </button>
+            <button class="ghost small" id="clearTextBtn">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-radierer"/></svg>
+              Leeren
+            </button>
+          </div>
+
+          <audio id="announcePlayer" controls hidden aria-label="Probe der Durchsage"></audio>
+          <p class="hint" id="announceHint">Wird mit der Praxisstimme gesprochen und über die Wartezimmer-Lautsprecher ausgegeben.</p>
+        </div>
+      </section>
+    </div>
+
+  </div>
+
+  <p class="hint">
+    <kbd>/</kbd> Suche &nbsp;·&nbsp; <kbd>Esc</kbd> bricht die laufende Ansage ab
+    &nbsp;·&nbsp; <kbd>Strg</kbd>+<kbd>Enter</kbd> im Durchsagefeld sendet
+  </p>
+</main>
+
+<!-- Kurzmeldungen werden Screenreadern vorgelesen, sobald sie erscheinen. -->
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/common.js"></script>
+<script src="/js/management.js"></script>
+</body>
+</html>

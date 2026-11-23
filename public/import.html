@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Import – Patientenaufruf</title>
+<link rel="stylesheet" href="/css/app.css">
+<style>
+  #drop {
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+    padding: 44px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  #drop:hover, #drop.over { border-color: var(--accent); background: var(--accent-soft); }
+  #drop .big { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+  #drop input { display: none; }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr)); gap: 12px; margin-bottom: 18px; }
+  .kpi { background: var(--bg-sunken); border-radius: var(--radius); padding: 14px 16px; }
+  .kpi .n { font-size: 26px; font-weight: 650; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .kpi .t { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; }
+  .kpi.good .n { color: var(--ok); }
+  .kpi.warn .n { color: var(--warn); }
+  .kpi.bad  .n { color: var(--danger); }
+
+  .maplist { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap: 8px; }
+  .maprow {
+    display: flex; justify-content: space-between; gap: 10px;
+    padding: 8px 12px; background: var(--bg-sunken); border-radius: var(--radius); font-size: 13.5px;
+  }
+  .maprow .to { font-family: var(--mono); color: var(--accent); }
+  .maprow.missing .to { color: var(--danger); }
+
+  #issues { max-height: 240px; overflow: auto; }
+  #issues li { font-size: 13px; margin-bottom: 5px; }
+  #issues li.warn { color: var(--warn); }
+  #issues li.error { color: var(--danger); }
+
+  #step2, #step3 { display: none; }
+  #step2[data-show="1"], #step3[data-show="1"] { display: block; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="dot"></span> Patientenaufruf</div>
+  <nav>
+    <a href="/">Übersicht</a>
+    <a href="/tv" target="_blank" rel="noopener">Monitor</a>
+    <a href="/import">Import</a>
+    <a href="/voice-studio">Stimme</a>
+    <a href="/system">System</a>
+  </nav>
+</header>
+
+<main class="page narrow">
+  <h1>Tagesliste importieren</h1>
+  <p class="subtitle">
+    Doctolib-Export als <strong>JSON</strong> oder <strong>CSV</strong> hochladen.
+    Der Import läuft in zwei Schritten – erst wird angezeigt, was passieren würde.
+  </p>
+
+  <!-- Schritt 1 -------------------------------------------------------- -->
+  <div class="card" id="step1">
+    <h2>1. Datei auswählen</h2>
+    <div id="drop" tabindex="0" role="button" aria-label="Datei auswählen oder hierher ziehen">
+      <div class="big">Datei hierher ziehen oder klicken</div>
+      <div class="muted">.json oder .csv, maximal 10 MB</div>
+      <input type="file" id="file" accept=".json,.csv,application/json,text/csv">
+    </div>
+    <label style="margin-top:16px; display:flex; align-items:center; gap:8px; font-weight:450;">
+      <input type="checkbox" id="todayOnly"> Nur Termine des heutigen Tages übernehmen
+    </label>
+  </div>
+
+  <!-- Schritt 2 -------------------------------------------------------- -->
+  <div class="card" id="step2">
+    <h2>2. Vorschau prüfen</h2>
+    <div class="kpis" id="kpis"></div>
+
+    <h2 style="margin-top:20px">Erkannte Feldzuordnung</h2>
+    <p class="hint" style="margin-top:-6px;margin-bottom:12px">
+      Links das Zielfeld, rechts die Spalte aus deiner Datei.
+    </p>
+    <div class="maplist" id="mapping"></div>
+
+    <div id="sampleWrap" style="margin-top:22px">
+      <h2>Stichprobe</h2>
+      <table>
+        <thead><tr><th>Zeit</th><th>Name</th><th>Anrede</th><th>Behandler</th></tr></thead>
+        <tbody id="sample"></tbody>
+      </table>
+    </div>
+
+    <div id="issuesWrap" style="margin-top:22px" hidden>
+      <h2>Hinweise <span class="badge warn" id="issueCount"></span></h2>
+      <ul id="issues"></ul>
+    </div>
+
+    <div class="card" style="background:var(--bg-sunken); box-shadow:none; margin-top:22px">
+      <h2>Übernahmeart</h2>
+      <label style="display:flex;gap:9px;align-items:flex-start;font-weight:450;margin-bottom:10px">
+        <input type="radio" name="mode" value="merge" checked style="margin-top:3px">
+        <span><strong>Abgleichen</strong> (empfohlen)<br>
+        <span class="muted" style="font-size:13px">Bekannte Termine werden aktualisiert, neue ergänzt.
+        Bereits aufgerufene oder laufende Behandlungen bleiben unberührt.</span></span>
+      </label>
+      <label style="display:flex;gap:9px;align-items:flex-start;font-weight:450">
+        <input type="radio" name="mode" value="replace" style="margin-top:3px">
+        <span><strong>Ersetzen</strong><br>
+        <span class="muted" style="font-size:13px">Wartende Patienten, die nicht in der Datei stehen, werden entfernt.
+        Aufgerufene und erledigte bleiben erhalten.</span></span>
+      </label>
+    </div>
+
+    <div class="row" style="margin-top:18px">
+      <button class="primary big" id="applyBtn">Import durchführen</button>
+      <button class="ghost" id="cancelBtn">Abbrechen</button>
+    </div>
+  </div>
+
+  <!-- Schritt 3 -------------------------------------------------------- -->
+  <div class="card" id="step3">
+    <h2>3. Fertig</h2>
+    <div id="result"></div>
+    <div id="prewarm" style="margin-top:18px" hidden>
+      <div class="row between" style="margin-bottom:8px">
+        <span class="muted">Ansagen werden im Hintergrund vorproduziert…</span>
+        <span class="mono" id="prewarmText"></span>
+      </div>
+      <div class="progress"><div id="prewarmBar" style="width:0%"></div></div>
+      <p class="hint">Danach reagiert jeder Aufrufknopf ohne Wartezeit. Du kannst die Seite gefahrlos verlassen.</p>
+    </div>
+    <div class="row" style="margin-top:20px">
+      <a class="btn" href="/">Zur Aufrufliste</a>
+      <button class="ghost" id="againBtn">Weitere Datei importieren</button>
+    </div>
+  </div>
+</main>
+
+<div id="toasts"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/common.js"></script>
+<script src="/js/import.js"></script>
+</body>
+</html>

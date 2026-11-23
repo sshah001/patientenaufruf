@@ -1,0 +1,508 @@
+/* ==========================================================================
+   Patientenaufruf – Gestaltung
+
+   Bewusst ein einziges, helles Farbschema: In einer Praxis wechseln sich
+   mehrere Personen am selben Rechner ab, und ein automatisch umschaltender
+   Dunkelmodus sorgt dort nur für Verwirrung. Die Palette ist gedämpft
+   gehalten – Stahlblau, Salbei, warmes Sandbraun – damit die Oberfläche über
+   einen ganzen Praxistag hinweg ruhig bleibt und nur das Wichtige (Aufruf,
+   Raum, Status) farblich heraussticht.
+   ========================================================================== */
+
+:root {
+  /* --- Flächen ---------------------------------------------------------- */
+  --bg: #f2f5f8;
+  --bg-elevated: #ffffff;
+  --bg-sunken: #e9eef4;
+  --bg-tint: #f7fafc;
+
+  --border: #dde5ed;
+  --border-strong: #c3cfdc;
+
+  /* --- Schrift ---------------------------------------------------------- */
+  --text: #223143;
+  --text-muted: #57697d;
+  --text-faint: #5e6774;
+
+  /* --- Akzent: ruhiges Stahlblau --------------------------------------- */
+  --accent: #2f6f9f;
+  --accent-hover: #26597f;
+  --accent-soft: #e7f0f7;
+  --accent-line: #bcd6e8;
+
+  /* --- Zustände: gedämpft, nicht grell --------------------------------- */
+  --ok: #3d8168;
+  --ok-soft: #e6f1ec;
+  --ok-line: #bcdbcc;
+
+  --warn: #a97428;
+  --warn-soft: #f8f1e3;
+  --warn-line: #e6d3ae;
+
+  --danger: #b1524e;
+  --danger-soft: #f8eae9;
+  --danger-line: #e7c6c4;
+
+  /* --- Form ------------------------------------------------------------- */
+  --radius-sm: 7px;
+  --radius: 11px;
+  --radius-lg: 15px;
+
+  --shadow-xs: 0 1px 2px rgba(34, 49, 67, 0.05);
+  --shadow: 0 1px 2px rgba(34, 49, 67, 0.05), 0 3px 10px rgba(34, 49, 67, 0.05);
+  --shadow-lg: 0 10px 34px rgba(34, 49, 67, 0.13);
+
+  --font: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Consolas, monospace;
+
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14.5px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---------------------------------------------------------------- Kopfzeile */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 22px;
+  height: 60px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-xs);
+}
+
+.topbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 650;
+  font-size: 15.5px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.topbar .brand .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 0 3px var(--ok-soft);
+  flex: none;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.topbar .brand .dot[data-state="off"] { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-soft); }
+.topbar .brand .dot[data-state="busy"] { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-soft); }
+
+.topbar nav { display: flex; gap: 2px; }
+
+.topbar nav a {
+  padding: 7px 13px;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 550;
+  font-size: 14px;
+  white-space: nowrap;
+  transition: background 0.12s, color 0.12s;
+}
+.topbar nav a:hover { background: var(--bg-sunken); color: var(--text); }
+.topbar nav a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+/* ------------------------------------------------------------------- Layout */
+.page {
+  max-width: 1460px;
+  margin: 0 auto;
+  padding: 26px 22px 72px;
+}
+.page.narrow { max-width: 880px; }
+
+h1 {
+  font-size: 23px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  margin: 0 0 5px;
+  color: var(--text);
+}
+h2 {
+  font-size: 15.5px;
+  font-weight: 650;
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+.subtitle {
+  color: var(--text-muted);
+  margin: 0 0 24px;
+  font-size: 14px;
+}
+
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  box-shadow: var(--shadow);
+  margin-bottom: 18px;
+}
+.card > h2:first-child { margin-top: 0; }
+
+.grid { display: grid; gap: 18px; }
+.grid.cols-2 { grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+.grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.row.between { justify-content: space-between; }
+.spacer { flex: 1; }
+
+/* ----------------------------------------------------------------- Elemente */
+button, .btn {
+  font: inherit;
+  font-weight: 550;
+  padding: 8px 15px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s, box-shadow 0.13s, transform 0.07s;
+  white-space: nowrap;
+  box-shadow: var(--shadow-xs);
+}
+button:hover:not(:disabled), .btn:hover {
+  background: var(--bg-tint);
+  border-color: var(--accent-line);
+}
+button:active:not(:disabled) { transform: translateY(1px); box-shadow: none; }
+button:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+button.primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+button.success { background: var(--ok); border-color: var(--ok); color: #fff; }
+button.success:hover:not(:disabled) { filter: brightness(0.94); background: var(--ok); border-color: var(--ok); }
+
+button.danger { color: var(--danger); border-color: var(--danger-line); background: var(--bg-elevated); }
+button.danger:hover:not(:disabled) { background: var(--danger-soft); border-color: var(--danger); }
+
+button.warn { color: var(--warn); border-color: var(--warn-line); background: var(--bg-elevated); }
+button.warn:hover:not(:disabled) { background: var(--warn-soft); border-color: var(--warn); }
+
+button.ghost { border-color: transparent; background: transparent; color: var(--text-muted); box-shadow: none; }
+button.ghost:hover:not(:disabled) { background: var(--bg-sunken); color: var(--text); border-color: transparent; }
+
+button.small { padding: 5px 11px; font-size: 13px; }
+button.big { padding: 13px 22px; font-size: 15.5px; }
+
+a.btn { text-decoration: none; display: inline-block; }
+
+input, select, textarea {
+  font: inherit;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elevated);
+  color: var(--text);
+  width: 100%;
+  transition: border-color 0.13s, box-shadow 0.13s;
+}
+input:hover, select:hover, textarea:hover { border-color: var(--accent-line); }
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  outline: none;
+}
+input[type="checkbox"], input[type="radio"] { width: auto; }
+textarea { resize: vertical; min-height: 84px; line-height: 1.5; }
+::placeholder { color: var(--text-faint); }
+
+label { display: block; font-size: 12.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 5px; }
+.field { margin-bottom: 15px; }
+.hint { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+
+/* ------------------------------------------------------------------ Marken */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 650;
+  background: var(--bg-sunken);
+  color: var(--text-muted);
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.badge.waiting { background: var(--bg-sunken); color: var(--text-muted); }
+.badge.called { background: var(--accent-soft); color: var(--accent); border-color: var(--accent-line); }
+.badge.in_treatment { background: var(--warn-soft); color: var(--warn); border-color: var(--warn-line); }
+.badge.completed { background: var(--ok-soft); color: var(--ok); border-color: var(--ok-line); }
+.badge.no_show { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-line); }
+.badge.ok { background: var(--ok-soft); color: var(--ok); border-color: var(--ok-line); }
+.badge.warn { background: var(--warn-soft); color: var(--warn); border-color: var(--warn-line); }
+.badge.error { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-line); }
+
+/* ----------------------------------------------------------------- Tabellen */
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-tint);
+}
+td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: none; }
+tbody tr { transition: background 0.1s; }
+tbody tr:hover { background: var(--bg-tint); }
+
+.mono { font-family: var(--mono); font-size: 12.5px; }
+.muted { color: var(--text-muted); }
+.faint { color: var(--text-faint); }
+.nowrap { white-space: nowrap; }
+.right { text-align: right; }
+
+/* ---------------------------------------------------------------- Meldungen */
+.notice {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  background: var(--bg-tint);
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+.notice.ok { border-color: var(--ok-line); border-left-color: var(--ok); background: var(--ok-soft); color: var(--ok); }
+.notice.warn { border-color: var(--warn-line); border-left-color: var(--warn); background: var(--warn-soft); color: var(--warn); }
+.notice.error { border-color: var(--danger-line); border-left-color: var(--danger); background: var(--danger-soft); color: var(--danger); }
+
+/* Kurzmeldungen unten rechts */
+#toasts {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 380px;
+}
+.toast {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  box-shadow: var(--shadow-lg);
+  font-size: 14px;
+  animation: toast-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast.ok { border-left-color: var(--ok); }
+.toast.warn { border-left-color: var(--warn); }
+.toast.error { border-left-color: var(--danger); }
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.empty {
+  padding: 44px 20px;
+  text-align: center;
+  color: var(--text-faint);
+  font-size: 14px;
+}
+
+/* --------------------------------------------------------------- Ladebalken */
+.progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--bg-sunken);
+  overflow: hidden;
+}
+.progress > div {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 999px;
+  transition: width 0.25s;
+}
+
+/* ------------------------------------------------------------------ Dialoge */
+dialog.modal {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+  padding: 26px 28px;
+  width: min(440px, calc(100vw - 32px));
+  font-family: var(--font);
+}
+dialog.modal::backdrop { background: rgba(34, 49, 67, 0.3); backdrop-filter: blur(2px); }
+dialog.modal h2 { font-size: 17px; margin-bottom: 10px; }
+dialog.modal p { margin: 0; color: var(--text-muted); font-size: 14.5px; line-height: 1.55; }
+
+/* ------------------------------------------------------------------- Klein */
+kbd {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 760px) {
+  .topbar { gap: 10px; padding: 0 12px; height: auto; flex-wrap: wrap; padding-bottom: 8px; padding-top: 8px; }
+  .topbar nav a { padding: 6px 9px; font-size: 13px; }
+  .page { padding: 18px 12px 48px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ==========================================================================
+   Symbole
+   Inline-SVG statt Emoji oder Icon-Schriftart: gestochen scharf, nimmt die
+   Textfarbe an, braucht keine externe Datei (die Content-Security-Policy
+   erlaubt ohnehin keine) – und Screenreader überspringen sie, weil jedes
+   Symbol aria-hidden trägt und daneben echter Text steht.
+   ========================================================================== */
+.icon {
+  width: 1.05em;
+  height: 1.05em;
+  flex: none;
+  vertical-align: -0.16em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon.solid { fill: currentColor; stroke: none; }
+
+button .icon, .btn .icon { margin-right: 0.42em; }
+button.icon-only .icon, .btn.icon-only .icon { margin-right: 0; }
+
+/* ==========================================================================
+   Farbige Bereichsköpfe
+   Jeder Bereich bekommt eine eigene Farbe UND ein eigenes Symbol. Die Farbe
+   allein trägt keine Information – das ist Voraussetzung dafür, dass die
+   Oberfläche auch bei Farbsehschwäche eindeutig bleibt (WCAG 1.4.1).
+   Alle Kombinationen erreichen mindestens 4.5:1 Kontrast.
+   ========================================================================== */
+.panel > header.filled {
+  color: #fff;
+  background: var(--head, var(--accent));
+  border-bottom: none;
+  font-size: 15px;
+  padding: 13px 18px;
+}
+.panel > header.filled .count {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+/* Auf hellem Grund (Bernstein) braucht es dunkle Schrift für den Kontrast. */
+.panel > header.filled.on-light { color: #3b2c05; }
+.panel > header.filled.on-light .count { background: rgba(0, 0, 0, 0.14); color: #3b2c05; }
+
+.head-waiting   { --head: #e0a32a; }
+.head-treatment { --head: #2f6f9f; }
+.head-done      { --head: #3d8168; }
+.head-speak     { --head: #6a5da8; }
+.head-call      { --head: #17809a; }
+
+/* ==========================================================================
+   Barrierefreiheit
+   ========================================================================== */
+
+/* Sprungmarke: erst beim Tabben sichtbar, führt direkt zum Inhalt. */
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 300;
+  padding: 10px 18px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-decoration: none;
+  transition: top 0.15s;
+}
+.skip-link:focus { top: 12px; }
+
+/* Nur für Screenreader – optisch nicht vorhanden, aber vorgelesen. */
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Deutlich sichtbarer Fokusring – bei Tastaturbedienung unverzichtbar. */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Berührungsflächen: mindestens 34 px hoch, damit sie auf einem Tablet am
+   Tresen sicher zu treffen sind. */
+button, .btn, select, input[type="search"], input[type="text"] { min-height: 34px; }
+button.small, .btn.small { min-height: 30px; }
+
+/* Windows-Kontrastmodus: Flächen verlieren dort ihre Farbe, deshalb müssen
+   Ränder erhalten bleiben. */
+@media (forced-colors: active) {
+  .panel > header.filled { border-bottom: 1px solid CanvasText; }
+  .badge { border: 1px solid CanvasText; }
+  .icon { stroke: CanvasText; }
+  button { border: 1px solid ButtonText; }
+}
+
+/* Nutzer, die mehr Kontrast angefordert haben, bekommen kräftigere Ränder. */
+@media (prefers-contrast: more) {
+  :root {
+    --border: #b3c0cf;
+    --border-strong: #8a9bad;
+    --text-muted: #46596e;
+  }
+}
