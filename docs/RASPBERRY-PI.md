@@ -115,7 +115,7 @@ genügt:
 ```bash
 cd docker
 docker compose build
-docker compose up -d
+docker compose --env-file ../.env up -d
 ```
 
 Der Bau dauert auf einem Pi einige Minuten, vor allem wegen `pip install

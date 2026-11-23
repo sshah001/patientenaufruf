@@ -79,10 +79,10 @@ node -e "console.log('DISPLAY_TOKEN='  + require('crypto').randomBytes(16).toStr
 
 # 4. Starten
 cd docker
-docker compose up -d --build
+docker compose --env-file ../.env up -d --build
 
 # 5. Prüfen
-docker compose logs -f app
+docker compose --env-file ../.env logs -f app
 ```
 
 Danach im Browser `http://<server-ip>:3300` öffnen und mit dem PIN anmelden.
@@ -92,7 +92,7 @@ Danach im Browser `http://<server-ip>:3300` öffnen und mit dem PIN anmelden.
 ```bash
 git pull
 cd docker
-docker compose up -d --build
+docker compose --env-file ../.env up -d --build
 ```
 
 Datenbank, vorproduzierte Ansagen und Stimmen überleben das, weil sie im
@@ -367,6 +367,6 @@ jedem Fehler den nächsten Schritt.
 Laufende Meldungen:
 
 ```bash
-docker compose logs -f app          # mit Docker
+docker compose --env-file ../.env logs -f app          # mit Docker
 sudo journalctl -u patientenaufruf -f  # mit systemd
 ```

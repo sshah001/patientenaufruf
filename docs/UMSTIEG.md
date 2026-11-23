@@ -34,8 +34,8 @@ cp .env.example .env
 #   PIPER_VOICE=<eine vorhandene Stimme, z. B. de_DE-thorsten-medium>
 #   SESSION_SECRET, APP_PIN, DISPLAY_TOKEN, SIGNAGE_PASSWORD, OPENWEATHER_API_KEY
 cd docker
-docker compose -p patientenaufruf-v2 up -d --build
-docker compose -p patientenaufruf-v2 logs -f app
+docker compose --env-file ../.env -p patientenaufruf-v2 up -d --build
+docker compose --env-file ../.env -p patientenaufruf-v2 logs -f app
 ```
 
 Dann `http://192.168.130.196:3301/system` öffnen und den Selbsttest ausführen.
@@ -50,7 +50,7 @@ Wenn alles passt:
 docker stop patientenaufruf-app          # alte Version anhalten (nicht löschen)
 # in /opt/patientenaufruf-v2/.env: HOST_PORT=3300, APP_PUBLIC_URL=…:3300
 cd /opt/patientenaufruf-v2/docker
-docker compose -p patientenaufruf-v2 up -d
+docker compose --env-file ../.env -p patientenaufruf-v2 up -d
 ```
 
 In piSignage das Asset von `monitor-rss.html` auf `/tv?token=…` umstellen.
@@ -59,6 +59,6 @@ In piSignage das Asset von `monitor-rss.html` auf `/tv?token=…` umstellen.
 ## Zurück zur alten Version
 
 ```bash
-docker compose -p patientenaufruf-v2 down
+docker compose --env-file ../.env -p patientenaufruf-v2 down
 docker start patientenaufruf-app
 ```

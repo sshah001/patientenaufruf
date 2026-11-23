@@ -1,11 +1,13 @@
 # =============================================================================
 #  Patientenaufruf – Betrieb mit Docker Compose
 #
-#  Start:   cd docker && docker compose up -d --build
-#  Logs:    docker compose logs -f app
-#  Update:  git pull && docker compose up -d --build
+#  Start:   cd docker && docker compose --env-file ../.env up -d --build
+#  Logs:    docker compose --env-file ../.env logs -f app
+#  Update:  git pull && docker compose --env-file ../.env up -d --build
 #
 #  Alle Geheimnisse und Adressen stehen in der Datei ../.env – NICHT hier.
+#  WICHTIG: immer mit "--env-file ../.env" aufrufen, sonst gelten HOST_PORT und
+#  PIPER_VOICES_HOST_DIR nicht (Compose liest sonst nur docker/.env).
 #  Eine Datenbank als eigener Dienst ist nicht mehr nötig: die Daten liegen
 #  als SQLite-Datei im Volume "app_data" (data/patientenaufruf.db).
 # =============================================================================
