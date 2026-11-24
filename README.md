@@ -224,7 +224,8 @@ Die wichtigsten Werte:
 | Variable | Bedeutung |
 |---|---|
 | `APP_PUBLIC_URL` | Im Netz erreichbare Adresse. Mopidy und der TV laden hierüber – **nicht** `localhost`. |
-| `APP_PIN` | Zugang zur Bedienoberfläche |
+| `SECURITY_AUTH_ENABLED` | `false` (Standard): Bedienung ohne PIN; `true`: Anmeldung mit `APP_PIN` |
+| `APP_PIN` | PIN für die Bedienoberfläche, nur bei `SECURITY_AUTH_ENABLED=true` |
 | `SESSION_SECRET` | Signatur der Anmeldung, 32+ zufällige Zeichen |
 | `DISPLAY_TOKEN` | Zugang für TV, Monitor und RSS |
 | `PIPER_BIN` | Pfad zur Piper-Datei |

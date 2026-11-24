@@ -607,6 +607,11 @@ document.getElementById("addBtn").addEventListener("click", async () => {
   }
 });
 
+// Ohne PIN-Anmeldung (SECURITY_AUTH_ENABLED=false) gibt es nichts abzumelden.
+api("/api/auth/me")
+  .then((me) => { if (me && me.authEnabled === false) document.getElementById("logoutBtn").hidden = true; })
+  .catch(() => {});
+
 document.getElementById("logoutBtn").addEventListener("click", async () => {
   await api("/api/auth/logout", { method: "POST" }).catch(() => {});
   window.location.href = "/login";
