@@ -41,6 +41,8 @@
   .callbox .phase { font-size: 13.5px; color: var(--text-muted); font-style: italic; }
   /* Drei Zustände: noch nichts (grau), letzter Aufruf (Farbe), läuft gerade
      (Farbe plus Ring und pulsierender Punkt). */
+  /* .empty aus app.css (Leerzustand von Listen) hier neutralisieren. */
+  .callbox.empty { padding: 0; text-align: left; }
   .callbox.empty > header { background: var(--text-faint); }
   .callbox.empty .who { font-weight: 450; color: var(--text-faint); font-size: 15.5px; }
   .callbox.live { box-shadow: 0 0 0 3px rgba(23, 128, 154, 0.22), var(--shadow); }
@@ -122,19 +124,8 @@
   button.recall:hover:not(:disabled) { background: #d0961f; border-color: #b8851b; }
 
   /* ------------------------------------------------------ Freie Durchsage */
-  /* Oben über der ganzen Breite: links der Text, rechts Optionen und Senden.
-     Bewusst niedrig gehalten, damit die Warteliste nicht weit nach unten rutscht. */
-  .speak .body {
-    padding: 14px 18px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 360px;
-    gap: 6px 24px;
-    align-items: start;
-  }
-  .speak .send { display: flex; flex-direction: column; }
-  .speak .send .options { margin-top: 0; }
-  .speak .send .hint { margin: 10px 0 0; }
-  @media (max-width: 1000px) { .speak .body { grid-template-columns: minmax(0, 1fr); } }
+  /* Rechte Spalte, über „In Behandlung“: Text, Vorlagen, Optionen, Senden. */
+  .speak .body { padding: 14px 16px; }
   #announceText { min-height: 64px; font-size: 14.5px; }
   .presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
   .presets button {
@@ -243,60 +234,6 @@
     </div>
   </section>
 
-  <!-- ------------------------------------------------ Freie Durchsage -->
-  <section class="panel speak" aria-labelledby="speakHead">
-    <header class="filled head-speak" id="speakHead">
-      <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-sprechblase"/></svg>
-      Durchsage
-    </header>
-    <div class="body">
-      <div class="compose">
-        <label class="sr-only" for="announceText">Text der Durchsage, höchstens 300 Zeichen</label>
-        <textarea id="announceText" maxlength="300" aria-describedby="announceCount announceHint"
-          placeholder="Text eingeben, der im Wartezimmer gesprochen werden soll…"></textarea>
-
-        <div class="presets" id="presets" role="group" aria-label="Vorlagen für Durchsagen"></div>
-      </div>
-      <div class="send">
-        <div class="options">
-          <label title="Aufmerksamkeitssignal vor der Ansage">
-            <input type="checkbox" id="optGong" checked> Gong
-          </label>
-          <label title="Text zusätzlich auf dem Wartezimmer-Monitor einblenden">
-            <input type="checkbox" id="optDisplay"> Auch anzeigen
-          </label>
-          <label for="optRepeats">
-            Wiederholen
-            <select id="optRepeats">
-              <option value="1" selected>1×</option>
-              <option value="2">2×</option>
-              <option value="3">3×</option>
-            </select>
-          </label>
-          <span id="announceCount" aria-live="off">0 / 300</span>
-      </div>
-
-      <div class="controls">
-        <button class="speakout" id="announceBtn">
-          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-megafon"/></svg>
-          Durchsagen
-        </button>
-        <button id="previewBtn" title="Nur hier anhören, nicht im Wartezimmer">
-          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-kopfhoerer"/></svg>
-          Vorhören
-        </button>
-        <button class="ghost small" id="clearTextBtn">
-          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-radierer"/></svg>
-          Leeren
-        </button>
-      </div>
-
-      <audio id="announcePlayer" controls hidden aria-label="Probe der Durchsage"></audio>
-      <p class="hint" id="announceHint">Wird mit der Praxisstimme gesprochen und über die Wartezimmer-Lautsprecher ausgegeben.</p>
-      </div>
-    </div>
-  </section>
-
   <div class="columns">
 
     <!-- ------------------------------------------------ Wartende Patienten -->
@@ -364,6 +301,60 @@
 
     <!-- --------------------------------------- Rechte Spalte: Behandlung --->
     <div>
+      <!-- ------------------------------------------------ Freie Durchsage -->
+      <section class="panel speak" aria-labelledby="speakHead">
+        <header class="filled head-speak" id="speakHead">
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-sprechblase"/></svg>
+          Durchsage
+        </header>
+        <div class="body">
+          <div class="compose">
+            <label class="sr-only" for="announceText">Text der Durchsage, höchstens 300 Zeichen</label>
+            <textarea id="announceText" maxlength="300" aria-describedby="announceCount announceHint"
+              placeholder="Text eingeben, der im Wartezimmer gesprochen werden soll…"></textarea>
+
+            <div class="presets" id="presets" role="group" aria-label="Vorlagen für Durchsagen"></div>
+          </div>
+          <div class="send">
+            <div class="options">
+              <label title="Aufmerksamkeitssignal vor der Ansage">
+                <input type="checkbox" id="optGong" checked> Gong
+              </label>
+              <label title="Text zusätzlich auf dem Wartezimmer-Monitor einblenden">
+                <input type="checkbox" id="optDisplay"> Auch anzeigen
+              </label>
+              <label for="optRepeats">
+                Wiederholen
+                <select id="optRepeats">
+                  <option value="1" selected>1×</option>
+                  <option value="2">2×</option>
+                  <option value="3">3×</option>
+                </select>
+              </label>
+              <span id="announceCount" aria-live="off">0 / 300</span>
+          </div>
+
+          <div class="controls">
+            <button class="speakout" id="announceBtn">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-megafon"/></svg>
+              Durchsagen
+            </button>
+            <button id="previewBtn" title="Nur hier anhören, nicht im Wartezimmer">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-kopfhoerer"/></svg>
+              Vorhören
+            </button>
+            <button class="ghost small" id="clearTextBtn">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-radierer"/></svg>
+              Leeren
+            </button>
+          </div>
+
+          <audio id="announcePlayer" controls hidden aria-label="Probe der Durchsage"></audio>
+          <p class="hint" id="announceHint">Wird mit der Praxisstimme gesprochen und über die Wartezimmer-Lautsprecher ausgegeben.</p>
+          </div>
+        </div>
+      </section>
+
       <section class="panel" aria-labelledby="treatHead">
         <header class="filled head-treatment" id="treatHead">
           <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-puls"/></svg>

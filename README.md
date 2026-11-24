@@ -91,8 +91,8 @@ ISO-8601, `TT.MM.JJJJ`, `TT/MM/JJJJ`, `JJJJ-MM-TT`, Unix-Zeitstempel.
 
 ### Aufruf per Knopfdruck
 
-Die Startseite zeigt oben den aktuellen Aufruf und die freie Durchsage,
-darunter links alle wartenden Patienten und rechts die laufenden Behandlungen. In jeder Zeile wird der Raum direkt
+Die Startseite zeigt oben den aktuellen Aufruf, darunter links alle wartenden
+Patienten und rechts die freie Durchsage und die laufenden Behandlungen. In jeder Zeile wird der Raum direkt
 gewählt und aufgerufen – eine Person am Tresen kann so ohne Umschalten auf
 verschiedene Zimmer verteilen. Die Raumwahl gilt nur für die eine Zeile und
 bleibt erhalten, auch wenn sich die Liste aktualisiert.
